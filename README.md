@@ -1,6 +1,7 @@
-# buildRoboCar
-building a RoboCar with the meetup group Esslinger Makerspace Projekt: Autonomen RoboCar bauen http://meetu.ps/c/3BgXd/xHvLx/f
+# Build a RoboCar
 
-## Dokumentation
+In this repository the file of building a RoboCar with the meetup group "Esslinger Makerspace Projekt: Autonomen RoboCar bauen"" https://www.meetup.com/Esslingen-Makerspace/ is stored
 
-Die Dokumentation kann unter uwe.sterr.de/RoboCar gefunden werden
+## Documentation
+
+The documentation can be found at http://www.uwesterr.de/RoboCar/

@@ -1,0 +1,50 @@
+# Resources {#Resources}
+
+In this section intersting resources for different topics are listed
+
+## Meetups
+
+### Esslinger Makerspace Projekt: Autonomen RoboCar bauen
+
+https://www.meetup.com/Esslingen-Makerspace/  
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(knitr)
+library(jpeg)
+include_graphics("images/EliasCar.jpg")
+```
+
+
+
+### Autonomous Mobility Berlin 
+https://www.meetup.com/autonomous-mobility-berlin/ 
+
+
+## RoboCar projects
+
+### DIY RoboCars
+
+This is the sister site to DIY Drones and resource/community companion to the DIY Robocars Meetup Group. Created by Chris Anderson of 3DR.
+
+https://diyrobocars.com/about/ 
+
+#### Donkey car
+
+An opensource DIY self driving platform for small scale cars. 
+RC CAR  +  Raspberry Pi + Python (tornado, keras, tensorflow, opencv, ....) 
+
+http://www.donkeycar.com 
+
+ 
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(knitr)
+library(jpeg)
+include_graphics("images/donkey-car-graphic_orig.jpg")
+```
+
+
+## Simulators
+
+
+
+
