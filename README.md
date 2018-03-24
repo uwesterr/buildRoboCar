@@ -4,4 +4,4 @@ In this repository the file of building a RoboCar with the meetup group "Essling
 
 ## Documentation
 
-The documentation can be found at http://www.uwesterr.de/RoboCar/
+The documentation can be found at http://www.uwesterr.de
