@@ -1,0 +1,31 @@
+# Experiences gathered {#experiences}
+
+Here I will write down how the adventure goes
+
+## Install donkey car on Mac
+
+http://docs.donkeycar.com/guide/install_software/#install-donkeycar-on-mac
+
+Installation went without problem. Note: After closing the Terminal, when you open it again, you will need to type **source activate donkey** to re-enable the mappings to donkey specific Python libraries
+
+## Donkey car simulator
+
+http://docs.donkeycar.com/guide/simulator/
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(knitr)
+include_graphics("images/DonkeyCarSimulator.png")
+```
+
+Typical Use
+
+- Start simulator
+- Double check that **log** dir exists and is empty
+- Start scene of your choice
+- Hit **Auto Drive w Rec** button
+- Vary the Max Speed, Prop, and Diff sliders to obtain a variety of driving styles
+- Wait 10-15 minutes until you have recorded 10K+ frames of data.
+- Hit the **Stop** button
+- Hit the **Exit** button
+- Move the log dir to the **~/d2/data/** dir where you normally put tub data. - This will create a **~/d2/data/log** path.
+- Train as usual.

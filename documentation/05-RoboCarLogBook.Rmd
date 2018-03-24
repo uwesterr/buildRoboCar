@@ -1,0 +1,474 @@
+# RoboCar Logbook {#robocarLogBook}
+The logbook shall be the place to log activities so that future me will understand what present me was doing and maybe even why.
+
+## 15-02-2018
+
+Alreay installed donkey software on mac at **/Users/uwesterr/miniconda3/envs/donkey** according to http://docs.donkeycar.com/guide/install_software/#install-donkeycar-on-mac 
+
+### donkey findcar
+the command ```donkey findcar``` leads to 
+```sudo: nmap: command not found``` therefore nmap shall be installed using 
+```sudo apt install nmap```  
+
+this leads to error message
+```Unable to locate an executable at "/Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/bin/apt" (-1)``` 
+
+
+## Build sunfounder car 17-02-2018
+
+took about 4h, very good instructions at  https://www.sunfounder.com/learn/download/U21hcnRfVmlkZW9fQ2FyX2Zvcl9SYXNwYmVycnlfUGkucGRm/dispi 
+
+### install software 18-02-2018
+
+download RASPBIAN STRETCH LITE  from https://www.raspberrypi.org/downloads/raspbian/ 
+use Etcher to flash SD card for raspi and put SD card in adapter to put into card reader of mac book
+
+Create a blank file ssh under the /boot directory to enable remote login and delete the suffix in the file name.
+
+Create a WiFi configuration file wpa_supplicant.conf under /boot according to http://www.linux-ratgeber.de/wlan-verbindungsdaten-einrichten-ueber-die-wpa_supplicant-conf/
+
+
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+ 
+network={
+    ssid="WLAN-NAME_1"
+    psk="WLAN-SCHLUESSEL_1"
+    proto=RSN
+    scan_ssid=1
+    key_mgmt=WPA-PSK
+    pairwise=CCPM
+    group=TKIP
+}
+
+#### boot up raspi
+username: pi
+password: raspberry
+
+change password type  
+
+```passwd```  
+and follow instructions
+
+change to german keyboard layout
+```sudo nano /etc/default/keyboard```
+
+find where it says
+
+```XKBLAYOUT=”gb”``` 
+to
+```XKBLAYOUT=”de”``` 
+
+and change the gb to the two letter code for german
+
+pipe symbol | => 
+
+```alt option + <```
+
+ Get Source Code
+```
+sudo apt-get install git
+git clone https://github.com/sunfounder/Sunfounder_Smart_Video_Car_Kit_for_RaspberryPi.git
+```
+
+Install python-dev, python-smbus
+
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install python-dev sudo apt-get install python-smbus
+```
+
+Setup I2C Port
+
+```
+sudo raspi-config
+```
+
+
+could not get wlan to work install now RASPBIAN STRETCH WITH DESKTOP instead 
+RASPBIAN STRETCH LITE
+
+
+hostnam uwesCar
+
+do the follwoing steps again
+Get Source Code
+```
+sudo apt-get install git
+git clone https://github.com/sunfounder/Sunfounder_Smart_Video_Car_Kit_for_RaspberryPi.git
+```
+
+Install python-dev, python-smbus
+
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install python-dev sudo apt-get install python-smbus
+```
+
+Setup I2C Port
+done this time in pixel desktop
+
+Start calibration
+
+```
+cd ~/Sunfounder_Smart_Video_Car_Kit_for_RaspberryPi/server 
+sudo python cali_server.py
+```
+set wlan
+```
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+```
+
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+
+Run cali_client
+cali_client.py is written in python2, i got python 3 installed changed cali_client.py 
+added parenthesis for print statements
+Python 3 calls it tkinter not Tkinter.
+
+run
+```
+sudo python cali_client.py
+```
+leads to 
+```
+Exception in Tkinter callback
+Traceback (most recent call last):
+  File "/Users/uwesterr/miniconda3/lib/python3.6/tkinter/__init__.py", line 1699, in __call__
+    return self.func(*args)
+  File "cali_client.py", line 56, in left_reverse
+    tcpCliSock.send(left_cmd)
+TypeError: a bytes-like object is required, not 'str'
+```
+
+therefore build an environment with python 2
+```
+conda create --name sunfounder
+```
+gives
+```
+Package plan for installation in environment /Users/uwesterr/miniconda3/envs/sunfounder:
+```
+
+
+ To activate this environment, use:  
+ > source activate sunfounder
+
+ To deactivate an active environment, use:  
+ > source deactivate
+
+python --version
+Python 3.6.0 :: Continuum Analytics, Inc.
+
+
+## Viewing a list of available Python versions
+To list the versions of Python that are available to install, in your Terminal window or an Anaconda Prompt, run:
+```
+conda search python
+```
+
+
+This lists all packages whose names contain the text python.
+
+To list only the packages whose full name is exactly python, add the --full-name option. In your Terminal window or an Anaconda Prompt, run:
+```
+conda search --full-name python
+```
+
+conda search --full-name python
+
+build environment with python 2.7
+```
+conda create -n sunfounderPy27 python=2.7 anaconda
+```
+ To activate this environment, use:
+
+```
+ source activate sunfounderPy27
+```
+
+ To deactivate an active environment, use:
+```
+source deactivate
+```
+ 
+Uwes-MBP:~ uwesterr$  source activate sunfounderPy27
+(sunfounderPy27) Uwes-MBP:~ uwesterr$ python --version
+Python 2.7.13 :: Anaconda 4.4.0 (x86_64)
+
+raspberry ip 192.168.178.67
+
+
+## Run calibration
+
+on raspbeery
+```
+cd ~/Sunfounder_Smart_Video_Car_Kit_for_RaspberryPi/server 
+sudo python cali_server.py
+```
+
+on mac
+
+```
+source activate sunfounderPy27
+cd /Users/uwesterr/CloudProjectsUnderWork/ProjectsUnderWork/RoboCar/sunfounder/Sunfounder_Smart_Video_Car_Kit_for_RaspberryPi/client 
+sudo python cali_client.py
+
+```
+
+## MJPG-streamer Installation
+
+Installation
+Plug the USB camera into Raspberry Pi, and run the command lsusb. The GEMBIRD represents the USB camera; since it is printed on the screen, it indicates the system has recognized the camera.
+```
+lsusb
+```
+resutls in 
+```
+Bus 001 Device 004: ID 1908:2310 GEMBIRD
+Bus 001 Device 003: ID 0424:ec00 Standard Microsystems Corp. SMSC9512/9514 Fast
+Ethernet Adapter
+Bus 001 Device 002: ID 0424:9514 Standard Microsystems Corp. Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+
+```
+
+
+
+Check whether the driver for the camera works normally:
+ls /dev/vid* 
+```
+ls /dev/vid* 
+```
+results in 
+```
+/dev/video0
+```
+install the following software
+```
+sudo apt-get install subversion 
+sudo apt-get install libv4l-dev
+sudo apt-get install libjpeg8-dev 
+sudo apt-get install imagemagick
+```
+Compile the source code of MJPG-streamer:
+
+```
+cd /home/pi/Sunfounder_Smart_Video_Car_Kit_for_RaspberryPi/mjpg-streamer/mjpg-streamer
+sudo make USE_LIBV4L2=true clean all
+```
+
+Install:
+
+```
+sudo make DESTDIR=/usr install
+```
+
+### Testing
+Operation on Raspberry Pi
+
+Run the program:
+```
+sudo sh start.sh
+```
+
+on Mac
+Type in the following address at the address bar of your browser (Firefox is recommended):
+```
+http://192.168.178.67:8080/stream.html
+```
+
+
+# Get on the Road!
+Use two terminals for raspberry
+
+first teminal run jgp streamer
+
+```
+cd /home/pi/Sunfounder_Smart_Video_Car_Kit_for_RaspberryPi/mjpg-streamer/mjpg-streamer
+sudo sh start.sh
+```
+second terminal run tcp_server.py:
+
+```
+cd ~/Sunfounder_Smart_Video_Car_Kit_for_RaspberryPi/server
+sudo python tcp_server.py
+
+```
+
+on mac terminal in environment sunfounderPy27
+
+Type in the following address at the address bar of your browser (Firefox is recommended):
+```
+http://192.168.178.67:8080/stream.html
+```
+
+
+```
+source activate sunfounderPy27
+```
+
+```
+ cd /Users/uwesterr/CloudProjectsUnderWork/ProjectsUnderWork/RoboCar/sunfounder/Sunfounder_Smart_Video_Car_Kit_for_RaspberryPi/client 
+ sudo python client_App.py
+```
+
+
+## Install Xbox 360 controller
+
+install Xbox 360 controller drive on mac
+https://github.com/360Controller/360Controller/releases
+
+**NOTE!!!**  
+**it seems necessary to have the controller plugged into the USB port during boot up**
+
+According to http://www.philipzucker.com/python-xbox-controller-mac/ 
+Install pygame
+```
+python -m pip install -U pygame --user
+```
+create a jupyter notebook "xboxControllerOnMac.ipynb"" with 
+```
+import pygame
+import sys
+import time
+import socket
+import cPickle as pickle
+ 
+UDP_IP = "127.0.0.1"
+UDP_PORT = 5005
+MESSAGE = "Hello, World!"
+ 
+print "UDP target IP:", UDP_IP
+print "UDP target port:", UDP_PORT
+print "message:", MESSAGE
+ 
+sock = socket.socket(socket.AF_INET, # Internet
+                     socket.SOCK_DGRAM) # UDP
+ 
+ 
+ 
+pygame.init()
+ 
+pygame.joystick.init()
+clock = pygame.time.Clock()
+ 
+print pygame.joystick.get_count()
+_joystick = pygame.joystick.Joystick(0)
+_joystick.init()
+```
+gives: 
+
+>UDP target IP: 127.0.0.1  
+UDP target port: 5005  
+message: Hello, World!  
+1  
+
+watch out for the "1" which indicates that the controller was identified
+```
+while 1:
+	for event in pygame.event.get():
+		if event.type == pygame.JOYBUTTONDOWN:
+			print("Joystick button pressed.")
+			print event
+		if event.type == pygame.JOYAXISMOTION:
+			#print _joystick.get_axis(0)
+			#print event
+			if event.axis == 0: # this is the x axis
+				print event.value
+			if event.axis == 5: # right trigger
+				print event.value
+	xdir = _joystick.get_axis(0)
+ 
+	rtrigger = _joystick.get_axis(5)
+	#deadzone
+	if abs(xdir) < 0.2:
+		xdir = 0.0
+	if rtrigger < -0.9:
+		rtrigger = -1.0
+ 
+	MESSAGE = pickle.dumps([xdir,rtrigger])
+	sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+ 
+	clock.tick(30)
+```
+when using controller the following output was created
+
+>0.00781273842586  
+-1.00003051851  
+Joystick button pressed.  
+<Event(10-JoyButtonDown {'joy': 0, 'button': 6})>  
+0.0  
+0.00781273842586  
+Joystick button pressed.  
+<Event(10-JoyButtonDown {'joy': 0, 'button': 12})>  
+0.0312509537034  
+
+
+## Implement Xbox controller as input in client_App.py
+
+In client_App.py the part for driving forward extracted 
+```
+from Tkinter import *
+from socket import *      # Import necessary modules
+
+ctrl_cmd = ['forward', 'backward', 'left', 'right', 'stop', 'read cpu_temp', 'home', 'distance', 'x+', 'x-', 'y+', 'y-', 'xy_home']
+
+top = Tk()   # Create a top window
+top.title('Sunfounder Raspberry Pi Smart Video Car')
+
+HOST = '192.168.178.67'    # Server(Raspberry Pi) IP address
+PORT = 21567
+BUFSIZ = 1024             # buffer size
+ADDR = (HOST, PORT)
+
+tcpCliSock = socket(AF_INET, SOCK_STREAM)   # Create a socket
+tcpCliSock.connect(ADDR)                    # Connect with the server
+
+# =============================================================================
+# The function is to send the command forward to the server, so as to make the 
+# car move forward.
+# ============================================================================= 
+def forward_fun(event):
+	print 'forward'
+	tcpCliSock.send('forward')
+```	
+then keystrokes are binded to the forward function, this needs to be changed to bind Xbox controller values to the function
+```
+# =============================================================================
+# Bind buttons on the keyboard with the corresponding callback function to 
+# control the car remotely with the keyboard.
+# =============================================================================
+top.bind('<KeyPress-w>', forward_fun)   # Press down key 'w' on the keyboard and the car will drive forward.
+```
+
+
+
+from https://github.com/martinohanlon/XboxController/blob/master/XboxController.py  
+
+
+> JOYAXISMOTION  
+event.axis              event.value  
+0 - x axis left thumb   (+1 is right, -1 is left)  
+1 - y axis left thumb   (+1 is down, -1 is up)  
+2 - x axis right thumb  (+1 is right, -1 is left)  
+3 - y axis right thumb  (+1 is down, -1 is up)  
+4 - right trigger  
+5 - left trigger  
+
+
+>JOYBUTTONDOWN | JOYBUTTONUP  
+event.button  
+A = 0  
+B = 1  
+X = 2  
+Y = 3  
+LB = 4  
+RB = 5  
+BACK = 6  
+START = 7  
+XBOX = 8  
+LEFTTHUMB = 9  
+RIGHTTHUMB = 10  
+
