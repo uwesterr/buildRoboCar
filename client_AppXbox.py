@@ -1,5 +1,5 @@
 # This program enables to control the sunfounder car with a Xbox 360 USB controller via a Mac.
-# Please install the Xbox 360 driver first and ensure that the controller is connected to the USB port at the time of booting
+# Please install the Xbox 360 driver (https://github.com/360Controller/360Controller/releases) first and ensure that the controller is connected to the USB port at the time of booting
 # This file replaces the file "client_App.py" of the sunfounder software package.
 # Make sure you adapt the host IP adress to your system
 # Author: Uwe Sterr
