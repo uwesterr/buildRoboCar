@@ -4,19 +4,27 @@
 # Make sure you adapt the host IP adress to your system
 # Author: Uwe Sterr
 # Date: March 2018
-# Version: Draft A
-# Version working with following limitations
-# Speed control only for forward
+# Version: Draft B
+# change log:
+# Draft B: 
+# Capsulated XboxCode into function "XboxControl"
+# Can select either Web interface, Xbox controller or neural network
+# needs a line command parameter
+# "Web": web interface is used to control car
+# "Xbox": Xbox 360 controller is used to control car
+# "Neural" Neural network is used to control car
+# introduced threshold variables
+
+# Limitations
 # Steering only left, right or straight
+# Neural net not yet implemented
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from Tkinter import *
 from socket import *      # Import necessary modules
-import pygame
 
-
-ctrl_cmd = ['forward', 'backward', 'left', 'right', 'stop', 'read cpu_temp', 'home', 'distance', 'x+', 'x-', 'y+', 'y-', 'xy_home']
+ctrl_cmd = ['forward', 'backward', 'left', 'right', 'stop','home']
 
 top = Tk()   # Create a top window
 top.title('Sunfounder Raspberry Pi Smart Video Car')
@@ -28,17 +36,6 @@ ADDR = (HOST, PORT)
 
 tcpCliSock = socket(AF_INET, SOCK_STREAM)   # Create a socket
 tcpCliSock.connect(ADDR)                    # Connect with the server
-
-
-pygame.init()
- 
-pygame.joystick.init()
-clock = pygame.time.Clock()
- 
-print pygame.joystick.get_count()
-_joystick = pygame.joystick.Joystick(0)
-_joystick.init()
-
 
 # =============================================================================
 # The function is to send the command forward to the server, so as to make the 
@@ -98,6 +95,72 @@ def quit_fun(event):
 	tcpCliSock.close()
 
 # =============================================================================
+# Create buttons
+# =============================================================================
+Btn0 = Button(top, width=5, text='Forward')
+Btn1 = Button(top, width=5, text='Backward')
+Btn2 = Button(top, width=5, text='Left')
+Btn3 = Button(top, width=5, text='Right')
+Btn4 = Button(top, width=5, text='Quit')
+Btn5 = Button(top, width=5, height=2, text='Home')
+
+# =============================================================================
+# Buttons layout
+# =============================================================================
+Btn0.grid(row=0,column=1)
+Btn1.grid(row=2,column=1)
+Btn2.grid(row=1,column=0)
+Btn3.grid(row=1,column=2)
+Btn4.grid(row=3,column=2)
+Btn5.grid(row=1,column=1)
+
+# =============================================================================
+# Bind the buttons with the corresponding callback function.
+# =============================================================================
+Btn0.bind('<ButtonPress-1>', forward_fun)  # When button0 is pressed down, call the function forward_fun().
+Btn1.bind('<ButtonPress-1>', backward_fun)
+Btn2.bind('<ButtonPress-1>', left_fun)
+Btn3.bind('<ButtonPress-1>', right_fun)
+Btn0.bind('<ButtonRelease-1>', stop_fun)   # When button0 is released, call the function stop_fun().
+Btn1.bind('<ButtonRelease-1>', stop_fun)
+Btn2.bind('<ButtonRelease-1>', stop_fun)
+Btn3.bind('<ButtonRelease-1>', stop_fun)
+Btn4.bind('<ButtonRelease-1>', quit_fun)
+Btn5.bind('<ButtonRelease-1>', home_fun)
+
+# =============================================================================
+# Create buttons
+# =============================================================================
+Btn07 = Button(top, width=5, text='X+', bg='red')
+Btn08 = Button(top, width=5, text='X-', bg='red')
+Btn09 = Button(top, width=5, text='Y-', bg='red')
+Btn10 = Button(top, width=5, text='Y+', bg='red')
+Btn11 = Button(top, width=5, height=2, text='HOME', bg='red')
+
+# =============================================================================
+# Buttons layout
+# =============================================================================
+Btn07.grid(row=1,column=5)
+Btn08.grid(row=1,column=3)
+Btn09.grid(row=2,column=4)
+Btn10.grid(row=0,column=4)
+Btn11.grid(row=1,column=4)
+
+# =============================================================================
+# Bind button events
+# =============================================================================
+Btn07.bind('<ButtonPress-1>', x_increase)
+Btn08.bind('<ButtonPress-1>', x_decrease)
+Btn09.bind('<ButtonPress-1>', y_decrease)
+Btn10.bind('<ButtonPress-1>', y_increase)
+Btn11.bind('<ButtonPress-1>', xy_home)
+#Btn07.bind('<ButtonRelease-1>', home_fun)
+#Btn08.bind('<ButtonRelease-1>', home_fun)
+#Btn09.bind('<ButtonRelease-1>', home_fun)
+#Btn10.bind('<ButtonRelease-1>', home_fun)
+#Btn11.bind('<ButtonRelease-1>', home_fun)
+
+# =============================================================================
 # Bind buttons on the keyboard with the corresponding callback function to 
 # control the car remotely with the keyboard.
 # =============================================================================
@@ -111,12 +174,12 @@ top.bind('<KeyRelease-d>', home_fun)
 top.bind('<KeyRelease-s>', stop_fun)
 top.bind('<KeyRelease-w>', stop_fun)
 
-spd = 50
+#spd = 52
 
-def changeSpeed(spd):
+def changeSpeed(ev=None):
 	tmp = 'speed'
-	#global spd
-	#spd = event.value
+	global spd
+	spd = speed.get()
 	data = tmp + str(spd)  # Change the integers into strings and combine them with the string 'speed'. 
 	print 'sendData = %s' % data
 	tcpCliSock.send(data)  # Send the speed data to the server(Raspberry Pi)
@@ -128,9 +191,22 @@ speed = Scale(top, from_=0, to=100, orient=HORIZONTAL, command=changeSpeed)  # C
 speed.set(50)
 speed.grid(row=6, column=1)
 
-def main():
-	#top.mainloop()
-	while 1:
+def XboxControl():
+     import pygame
+     pygame.init()
+ 
+     pygame.joystick.init()
+     clock = pygame.time.Clock()
+ 
+     print pygame.joystick.get_count()
+     _joystick = pygame.joystick.Joystick(0)
+     _joystick.init()
+     tmp = 'speed'
+     thresThrottleLow = -0.05
+     thresThrottleHigh= 0.05
+     thresSteerLow = -0.5
+     thresSteerHigh= 0.5
+     while 1:
 		for event in pygame.event.get():
 			if event.type == pygame.JOYBUTTONDOWN:
 				print("Joystick button pressed.")
@@ -139,41 +215,47 @@ def main():
 			#print _joystick.get_axis(0)
 			#print event
 				if event.axis == 0: # this is the x axis
-				    if event.value > 0.7:
+				    if event.value > thresSteerHigh:
 				       tcpCliSock.send('right')
-				    if event.value < -0.7:
+				    if event.value < thresSteerLow:
 				       tcpCliSock.send('left') 
-				    if (event.value < 0.7) & (event.value > -0.6):
-				       tcpCliSock.send('home')   
-				       
+				    if (event.value < thresSteerHigh) & (event.value > thresSteerLow):
+				       tcpCliSock.send('home')   				       
 				         
 				if event.axis == 3: # this is the x axis
-				    if event.value < -0.1:
+				    if event.value < thresThrottleLow:
 				       tcpCliSock.send('forward')
 				       spd = int(100*abs(event.value))
-				       changeSpeed(spd)
-				    if event.value > 0.2:
+				       data = tmp + str(spd)  # Change the integers into strings and combine them with the string 'speed'.
+				       print 'sendData = %s' % data
+				       tcpCliSock.send(data)  # Send the speed data to the server(Raspberry Pi)
+ 
+				    if event.value > thresThrottleHigh:
 				       tcpCliSock.send('backward')
-				    if (event.value < 0.2) & (event.value > -0.6):
+				       spd = int(100*abs(event.value))
+				       data = tmp + str(spd)  # Change the integers into strings and combine them with the string 'speed'.
+				       print 'sendData = %s' % data
+				       tcpCliSock.send(data)  # Send the speed data to the server(Raspberry Pi)
+
+				    if (event.value < thresThrottleHigh) & (event.value > thresThrottleLow):
 				       tcpCliSock.send('stop')      
-   
-				              
-					
-				if event.axis == 5: # right trigger
-					tcpCliSock.send('right')
-		xdir = _joystick.get_axis(0)
- 
-	rtrigger = _joystick.get_axis(5)
-	#deadzone
-	if abs(xdir) < 0.2:
-		xdir = 0.0
-	if rtrigger < -0.9:
-		rtrigger = -1.0
- 
-	MESSAGE = pickle.dumps([xdir,rtrigger])
-	sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
- 
-	clock.tick(30)
+
+def NeuralNet():
+    print "not implemented yet"
+   # read image in
+   # pre process image
+   # calc steering angle using neural network
+   # send steering angle via wifi
+
+def main():
+    if sys.argv[1] == "Web":
+	   top.mainloop()
+
+    if sys.argv[1] == "Xbox":
+       XboxControl() 
+       
+    if sys.argv[1] == "Neural":
+       NeuralNet() 
 
 if __name__ == '__main__':
 	main()
