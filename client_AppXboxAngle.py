@@ -14,9 +14,10 @@
 # "Xbox": Xbox 360 controller is used to control car
 # "Neural" Neural network is used to control car
 # introduced threshold variables
+# Steering proportional now with lever postion
 
 # Limitations
-# Steering only left, right or straight
+
 # Neural net not yet implemented
 
 #!/usr/bin/env python
