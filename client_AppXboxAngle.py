@@ -3,8 +3,8 @@
 # This file replaces the file "client_App.py" of the sunfounder software package.
 # Make sure you adapt the host IP adress to your system
 # Author: Uwe Sterr
-# Date: March 2018
-# Version: Draft B
+# Date: May 2018
+# Version: Draft C
 # change log:
 # Draft B: 
 # Capsulated XboxCode into function "XboxControl"
@@ -14,11 +14,13 @@
 # "Xbox": Xbox 360 controller is used to control car
 # "Neural" Neural network is used to control car
 # introduced threshold variables
+# Draft C
 # Steering proportional now with lever postion
 
 # Limitations
 
 # Neural net not yet implemented
+# Add function to gather training data
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
