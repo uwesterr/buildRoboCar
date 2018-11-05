@@ -12,3 +12,10 @@ pre {
 pre code {
   white-space: inherit;
 }
+
+h2 {
+    background-color: #80ced6;
+}
+#caption{
+    background-color: #80ced6;
+}

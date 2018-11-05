@@ -3,7 +3,7 @@ The logbook shall be the place to log activities so that future me will understa
 
 ## 15-02-2018
 
-Alreay installed donkey software on mac at **/Users/uwesterr/miniconda3/envs/donkey** according to http://docs.donkeycar.com/guide/install_software/#install-donkeycar-on-mac 
+Already installed donkey software on mac at **/Users/uwesterr/miniconda3/envs/donkey** according to http://docs.donkeycar.com/guide/install_software/#install-donkeycar-on-mac 
 
 ### donkey findcar
 the command ```donkey findcar``` leads to 
@@ -76,7 +76,8 @@ Install python-dev, python-smbus
 ```
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get install python-dev sudo apt-get install python-smbus
+sudo apt-get install python-dev 
+sudo apt-get install python-smbus
 ```
 
 Setup I2C Port
@@ -309,6 +310,13 @@ http://192.168.178.67:8080/stream.html
 source activate sunfounderPy27
 ```
 
+or if openCV is needed
+
+```
+source activate carnd-term1 
+```
+
+
 ```
  cd /Users/uwesterr/CloudProjectsUnderWork/ProjectsUnderWork/RoboCar/sunfounder/Sunfounder_Smart_Video_Car_Kit_for_RaspberryPi/client 
  sudo python client_App.py
@@ -471,4 +479,105 @@ START = 7
 XBOX = 8  
 LEFTTHUMB = 9  
 RIGHTTHUMB = 10  
+
+
+### Make steering proportional to remote control lever position
+
+change code from 
+
+```
+if event.axis == 0: # this is the x axis
+		if event.value > thresSteerHigh:
+		   tcpCliSock.send('right')
+	  if event.value < thresSteerLow:
+		   tcpCliSock.send('left') 
+```
+
+to
+
+```
+if event.axis == 0: # this is the x axis
+		if event.value > thresSteerHigh:
+       tcpCliSock.send('right')
+	     angle = int(100*abs(event.value))
+       data = tmp1 + str(angle)  
+			 print 'sendData = %s' % data
+			 tcpCliSock.send(data)  # Send the speed data to the server(Raspberry Pi)
+		if event.value < thresSteerLow:
+		   tcpCliSock.send('left') 
+		   angle = int(-100*abs(event.value))
+			 data = tmp1 + str(angle)  
+			 print 'sendData = %s' % data
+			 tcpCliSock.send(data)  # Send the speed data to the server(Raspberry Pi)
+```
+## Get IP adress of raspi
+
+Check in the router for the IP adress, procedure is dependent on router
+At shackspace go to http://leases.shack/#/ (only available from the shackspace network)
+
+and then connect via ssh pi@ipAdress 
+
+## Store snapshots of video stream on local computer
+Donkey car stores training data on raspi SD card. In this concept the XBox controller is connected via USB to a laptop (in my case a Mac) and it makes sense to store the traing data on the laptop as well since we anyway will train the NN on that machine.
+
+The URL of the stream is:
+
+*url = "http://10.42.26.33:8080/?action=stream"*
+
+for a snapshot the URL is 
+*url = "http://10.42.26.33:8080/?action=snapshot"*
+
+check video https://youtu.be/2xcUzXataIk?t=556 for a good explanation of how to receive an IP video stream. Based on that tutorial the follwing code now stores a single frame and shows that frame as well.
+
+
+```
+import cv2
+import numpy as np
+import urllib
+ 
+# based on example in https://www.youtube.com/watch?v=2xcUzXataIk 
+url = "http://192.168.178.67:8080/?action=snapshot"  
+imgNp = np.array(bytearray(imgResp.read()), dtype = np.uint8)
+img = cv2.imdecode(imgNp,-1)
+cv2.imshow("test",img)
+cv2.imwrite( "Snapshot.jpg", img );
+cv2.waitKey(10000)
+```
+
+### Jie Hou's alternative
+
+Jie has another solution for the same task, see https://drive.google.com/drive/folders/10U8ZTr_2HVnBWrFqvVFGO0UyQn0vCmiE
+
+The code is
+
+```
+import cv2
+import numpy as np
+try:
+    from urllib.request import urlopen
+except ImportError:
+	from urllib2 import urlopen
+
+
+print('# capture image from video #')
+stream = urlopen('http://192.168.0.101:8080/?action=stream')
+bytes = bytes()
+FlagSaveImage = 0
+while True:
+	bytes += stream.read(1024)
+	a = bytes.find(b'\xff\xd8')
+	b = bytes.find(b'\xff\xd9')
+	print(' #a: ', a, ' ,b: ', b)
+	if a != -1 and b != -1:
+		jpg = bytes[a: b + 2]
+		bytes = bytes[b+2:]
+		image = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
+		cv2.imshow('image', image)
+		if FlagSaveImage == 0:
+			cv2.imwrite('test.jpg', image)
+			FlagSaveImage = 1
+		if cv2.waitKey(1) == 27:
+			exit(0)
+
+```
 
